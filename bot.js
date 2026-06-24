@@ -1,77 +1,114 @@
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 
-// Configuration
-const RESISTANCE_LEVEL = 55000.00;
-const BLOCKCHAIN_API_URL = 'https://blockchain.info/ticker';
-
 // Email configuration
 const EMAIL_CONFIG = {
   service: 'gmail',
   sender: 'onlineworkduminda@gmail.com',
-  appPassword: process.env.GMAIL_APP_PASSWORD || 'YOUR_GMAIL_APP_PASSWORD',
+  appPassword: process.env.GMAIL_APP_PASSWORD,
   receiver: 'eg.dumindasujeewa@gmail.com'
 };
 
-async function fetchBTCPrice() {
+// Get Futures Market Data
+async function fetchFuturesCoins() {
   try {
-    console.log('Fetching BTC price from Blockchain.info API...');
-    const response = await axios.get(BLOCKCHAIN_API_URL);
-    const price = parseFloat(response.data.USD.last);
-    console.log(`Current BTC Price: $${price.toFixed(2)}`);
-    return price;
+    console.log('Fetching Binance Futures data...');
+
+    const response = await axios.get(
+      'https://fapi.binance.com/fapi/v1/ticker/24hr'
+    );
+
+    return response.data;
   } catch (error) {
-    console.error('Error fetching BTC price:', error.message);
+    console.error('Error fetching futures data:', error.message);
     throw error;
   }
 }
 
-async function sendEmailAlert(currentPrice) {
-  try {
-    console.log('Setting up email transporter...');
-    const transporter = nodemailer.createTransport({
-      service: EMAIL_CONFIG.service,
-      auth: {
-        user: EMAIL_CONFIG.sender,
-        pass: EMAIL_CONFIG.appPassword
-      }
-    });
+// Filter good candidate coins
+function findCandidates(coins) {
 
-    const mailOptions = {
-      from: EMAIL_CONFIG.sender,
-      to: EMAIL_CONFIG.receiver,
-      subject: `🚨 BTC Price Alert - Resistance Level Reached!`,
-      text: `BTC has reached or exceeded the resistance level!\n\nCurrent Price: $${currentPrice.toFixed(2)}\nResistance Level: $${RESISTANCE_LEVEL.toFixed(2)}\n\nTime: ${new Date().toISOString()}`
-    };
+  const filtered = coins
+    .filter(c =>
+      c.symbol.endsWith('USDT') &&
+      parseFloat(c.quoteVolume) > 50000000 &&
+      Math.abs(parseFloat(c.priceChangePercent)) > 3
+    )
+    .sort(
+      (a, b) =>
+        parseFloat(b.quoteVolume) -
+        parseFloat(a.quoteVolume)
+    )
+    .slice(0, 10);
 
-    console.log('Sending email alert...');
-    await transporter.sendMail(mailOptions);
-    console.log('✅ Email alert sent successfully!');
-  } catch (error) {
-    console.error('Error sending email:', error.message);
-    throw error;
-  }
+  return filtered;
+}
+
+// Send email
+async function sendEmailAlert(candidates) {
+
+  const transporter = nodemailer.createTransport({
+    service: EMAIL_CONFIG.service,
+    auth: {
+      user: EMAIL_CONFIG.sender,
+      pass: EMAIL_CONFIG.appPassword
+    }
+  });
+
+  let message = '🚀 Futures Candidate Coins\n\n';
+
+  candidates.forEach((coin, index) => {
+
+    message +=
+      `${index + 1}. ${coin.symbol}\n` +
+      `24h Change: ${coin.priceChangePercent}%\n` +
+      `Volume: ${Number(coin.quoteVolume).toFixed(0)}\n\n`;
+
+  });
+
+  const mailOptions = {
+    from: EMAIL_CONFIG.sender,
+    to: EMAIL_CONFIG.receiver,
+    subject: '🚀 Futures Coin Scanner Alert',
+    text: message
+  };
+
+  await transporter.sendMail(mailOptions);
+
+  console.log('Email sent successfully');
 }
 
 async function main() {
+
   try {
-    console.log('=== Crypto Alert Bot Started ===');
-    console.log(`Resistance Level: $${RESISTANCE_LEVEL.toFixed(2)}`);
-    
-    const currentPrice = await fetchBTCPrice();
-    
-    if (currentPrice >= RESISTANCE_LEVEL) {
-      console.log('⚠️ Price is at or above resistance level! Sending alert...');
-      await sendEmailAlert(currentPrice);
-    } else {
-      console.log('Price is below resistance level. No alert needed.');
+
+    console.log('=== Futures Scanner Started ===');
+
+    const coins = await fetchFuturesCoins();
+
+    const candidates = findCandidates(coins);
+
+    if (candidates.length === 0) {
+
+      console.log('No candidates found');
+      return;
+
     }
-    
-    console.log('=== Bot execution completed ===');
+
+    console.log(
+      `Found ${candidates.length} candidate coins`
+    );
+
+    await sendEmailAlert(candidates);
+
+    console.log('=== Scanner Completed ===');
+
   } catch (error) {
-    console.error('Bot execution failed:', error.message);
-    process.exit(1);
+
+    console.error(error.message);
+
   }
+
 }
 
 main();
