@@ -2,7 +2,7 @@ const axios = require('axios');
 const nodemailer = require('nodemailer');
 
 // Configuration
-const RESISTANCE_LEVEL = 95000.00;
+const RESISTANCE_LEVEL = 55000.00;
 const BLOCKCHAIN_API_URL = 'https://blockchain.info/ticker';
 
 // Email configuration
