@@ -10,7 +10,7 @@ const EMAIL_CONFIG = {
   service: 'gmail',
   sender: 'onlineworkduminda@gmail.com',
   appPassword: process.env.GMAIL_APP_PASSWORD || 'YOUR_GMAIL_APP_PASSWORD',
-  receiver: 'dumindasujeewa@gmail.com'
+  receiver: 'eg.dumindasujeewa@gmail.com'
 };
 
 async function fetchBTCPrice() {
