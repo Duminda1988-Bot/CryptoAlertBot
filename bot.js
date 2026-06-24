@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 
 // Configuration
 const RESISTANCE_LEVEL = 95000.00;
-const BINANCE_API_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT';
+const COINDESK_API_URL = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json';
 
 // Email configuration
 const EMAIL_CONFIG = {
@@ -15,9 +15,9 @@ const EMAIL_CONFIG = {
 
 async function fetchBTCPrice() {
   try {
-    console.log('Fetching BTC price from Binance API...');
-    const response = await axios.get(BINANCE_API_URL);
-    const price = parseFloat(response.data.price);
+    console.log('Fetching BTC price from CoinDesk API...');
+    const response = await axios.get(COINDESK_API_URL);
+    const price = parseFloat(response.data.bpi.USD.rate_float);
     console.log(`Current BTC Price: $${price.toFixed(2)}`);
     return price;
   } catch (error) {
