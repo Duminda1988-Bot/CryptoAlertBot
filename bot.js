@@ -1,7 +1,19 @@
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 
-const WATCHLIST = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT", "ADAUSDT", "AVAXUSDT", "DOTUSDT", "LINKUSDT", "NEARUSDT"]; 
+const WATCHLIST = [
+  "BTCUSDT","ETHUSDT","BNBUSDT","XRPUSDT","SOLUSDT",
+  "DOGEUSDT","ADAUSDT","AVAXUSDT","LINKUSDT","MATICUSDT",
+  "DOTUSDT","NEARUSDT","APTUSDT","ARBUSDT","OPUSDT",
+  "SUIUSDT","SEIUSDT","INJUSDT","RNDRUSDT","FTMUSDT",
+  "GALAUSDT","ICPUSDT","AAVEUSDT","SANDUSDT","MKRUSDT",
+  "WLDUSDT","JUPUSDT","TIAUSDT","PEPEUSDT","FLOKIUSDT",
+  "SHIBUSDT","BONKUSDT","WIFUSDT","ORDIUSDT","SATSUSDT",
+  "LDOUSDT","ENSUSDT","IMXUSDT","STXUSDT","DYDXUSDT",
+  "ALGOUSDT","ATOMUSDT","TRXUSDT","LTCUSDT","XLMUSDT",
+  "BCHUSDT","ETCUSDT","HBARUSDT","PYTHUSDT",
+  "FETUSDT","TONUSDT","TAOUSDT","ONDOUSDT","ENAUSDT","NOTUSDT"
+]; 
 const SCORE_THRESHOLD = 60;
 
 const EMAIL_CONFIG = {
@@ -14,7 +26,7 @@ const EMAIL_CONFIG = {
 async function fetchMarketData() {
   console.log('Fetching data from CoinGecko (Anti-block)...');
   // CoinGecko public API
-  const res = await axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=100');
+  const res = await axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=volume_desc&per_page=250');
   
   // CoinGecko දත්ත බයිනෑන්ස් ෆෝමැට් එකට හැඩගස්වමු
   return res.data.map(c => ({
