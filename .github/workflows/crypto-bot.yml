@@ -1,6 +1,7 @@
 name: Crypto Price Alert Bot
 
 on:
+  push:
   schedule:
     # Run every 10 minutes
     - cron: '*/10 * * * *'
