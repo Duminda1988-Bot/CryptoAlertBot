@@ -38,8 +38,8 @@ async function fetchMarketData() {
 
 function scoreCoin(c) {
   let score = 0;
-  const volume = parseFloat(c.quoteVolume);
-  const change = parseFloat(c.priceChangePercent);
+  const volume = Number(c.quoteVolume || 0);
+  const change = Number(c.priceChangePercent || 0);
   const absChange = Math.abs(change);
 
   // Volume scoring
@@ -82,7 +82,7 @@ async function sendAlert(signals) {
   await transporter.sendMail({
     from: EMAIL_CONFIG.sender,
     to: EMAIL_CONFIG.receiver,
-    subject: `🚀 [Futures Alert] Top ${signals.length} Signals - ${signals[0].symbol}`,
+    subject: `🚀 [Futures Alert] Top ${signals.length} Signals - ${signals[0]?.symbol || 'N/A'}`,
     text: message
   });
 
@@ -96,6 +96,7 @@ async function main() {
     const market = await fetchMarketData();
     const signals = market
       .map(c => ({ ...c, score: scoreCoin(c) }))
+      .filter(c => c.score >= 50)
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
 
