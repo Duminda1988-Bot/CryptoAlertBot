@@ -23,9 +23,9 @@ const EMAIL_CONFIG = {
 };
 
 async function fetchMarketData() {
-  console.log('Fetching Binance Futures data...');
+  console.log('Fetching Binance Futures data via ScraperAPI...');
   const res = await axios.get(
-    'https://fapi.binance.com/fapi/v1/ticker/24hr',
+    `https://api.scraperapi.com?api_key=${process.env.SCRAPERAPI_KEY}&url=https://fapi.binance.com/fapi/v1/ticker/24hr`,
     {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'

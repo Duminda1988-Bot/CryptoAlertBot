@@ -26,5 +26,6 @@ jobs:
       
       - name: Run Crypto Alert Bot
         env:
+          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: node bot.js
