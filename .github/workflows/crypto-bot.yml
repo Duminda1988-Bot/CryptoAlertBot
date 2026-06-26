@@ -2,10 +2,10 @@ name: Crypto Price Alert Bot
 
 on:
   push:
+    branches:
+      - main
   schedule:
-    # Run every 10 minutes
     - cron: '0,10,20,30,40,50 * * * *'
-  # Allow manual triggering
   workflow_dispatch:
 
 jobs:
